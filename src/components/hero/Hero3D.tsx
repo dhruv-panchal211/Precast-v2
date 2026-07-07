@@ -21,7 +21,7 @@ import { Canvas } from "@react-three/fiber";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { PHASES, RAIL_PHASES } from "@/lib/phases";
+import { PHASES, RAIL_PHASES, ENTRY_END } from "@/lib/phases";
 import { useScrollPhases } from "@/lib/useScrollPhases";
 import { CaptionCard } from "./overlay/CaptionCard";
 import { PhaseRail } from "./overlay/PhaseRail";
@@ -33,8 +33,27 @@ const Scene = dynamic(() => import("./Scene").then((m) => m.Scene), { ssr: false
 
 gsap.registerPlugin(ScrollTrigger);
 
-/** Scroll track length: ~10 viewport-heights of narrative. */
-const TRACK_VH = 1000;
+/**
+ * Scroll budget, split by narrative segment. The exterior assembly keeps a
+ * generous scroll length; the interior walkthrough is deliberately kept short
+ * so it doesn't feel like endless scrolling once you're inside.
+ *
+ * Progress p maps to scroll non-linearly (see `remapProgress`): the exterior
+ * (p ≤ ENTRY_END) owns EXTERIOR_VH of scroll, the interior (p > ENTRY_END)
+ * owns only INTERIOR_VH — so the same interior stops take far less thumb travel.
+ */
+const EXTERIOR_VH = 700;
+const INTERIOR_VH = 150;
+const TRACK_VH = EXTERIOR_VH + INTERIOR_VH;
+const TRACK_VH_LOW = Math.round(TRACK_VH * 0.75);
+/** Fraction of the scroll track spent on the exterior (before the interior). */
+const SPLIT_SCROLL = EXTERIOR_VH / TRACK_VH;
+
+/** Map linear scroll s∈[0,1] → narrative progress p∈[0,1], compressing interior. */
+function remapProgress(s: number): number {
+  if (s <= SPLIT_SCROLL) return (s / SPLIT_SCROLL) * ENTRY_END;
+  return ENTRY_END + ((s - SPLIT_SCROLL) / (1 - SPLIT_SCROLL)) * (1 - ENTRY_END);
+}
 
 export function Hero3D() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -84,8 +103,9 @@ export function Hero3D() {
       trigger: sectionRef.current,
       start: "top top",
       end: "bottom bottom",
-      scrub: true, // Lenis already smooths input; keep the map 1:1
-      onUpdate: (self) => useScrollPhases.getState().setProgress(self.progress),
+      scrub: true, // Lenis already smooths input; the segment remap is applied below
+      onUpdate: (self) =>
+        useScrollPhases.getState().setProgress(remapProgress(self.progress)),
     });
 
     return () => {
@@ -133,7 +153,7 @@ export function Hero3D() {
       id="experience"
       className="hero3d"
       // Shorter track on small screens — same narrative, less thumb travel.
-      style={{ height: reduced ? "100vh" : `${quality === "low" ? 700 : TRACK_VH}vh` }}
+      style={{ height: reduced ? "100vh" : `${quality === "low" ? TRACK_VH_LOW : TRACK_VH}vh` }}
       aria-label="Precast building assembly experience"
     >
       <div className="hero3d-stage">

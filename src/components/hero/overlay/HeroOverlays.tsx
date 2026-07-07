@@ -19,23 +19,38 @@ export function HeroTitle() {
 
   useEffect(() => {
     if (!ref.current) return;
+    const items = ref.current.querySelectorAll<HTMLElement>("[data-hero-item]");
     gsap.to(ref.current, {
       autoAlpha: visible ? 1 : 0,
-      y: visible ? 0 : -24,
-      duration: 0.8,
+      duration: 0.6,
       ease: "power2.inOut",
+    });
+    gsap.to(items, {
+      y: visible ? 0 : 22,
+      autoAlpha: visible ? 1 : 0,
+      duration: 0.8,
+      ease: "power3.out",
+      stagger: visible ? 0.09 : 0,
     });
   }, [visible]);
 
   return (
     <div ref={ref} className="hero-title">
-      <p className="hero-kicker">Bhaarat Precast</p>
-      <h1>
+      <p className="hero-kicker" data-hero-item>
+        <span className="hero-kicker-dot" aria-hidden />
+        Bhaarat Precast
+      </p>
+      <h1 data-hero-item>
         Engineered offsite.
         <br />
-        Assembled with certainty.
+        Assembled with <em>certainty</em>.
       </h1>
-      <p className="hero-sub">Scroll to raise the building — element by precast element.</p>
+      <p className="hero-punch" data-hero-item>
+        We don&apos;t pour buildings — we place them.
+      </p>
+      <p className="hero-sub" data-hero-item>
+        Scroll to raise the building — element by precast element.
+      </p>
     </div>
   );
 }
