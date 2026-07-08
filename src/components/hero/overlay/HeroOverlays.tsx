@@ -41,12 +41,12 @@ export function HeroTitle() {
         Bhaarat Precast
       </p>
       <h1 data-hero-item>
-        Engineered offsite.
+        Engineered off-site.
         <br />
         Assembled with <em>certainty</em>.
       </h1>
       <p className="hero-punch" data-hero-item>
-        We don&apos;t pour buildings — we place them.
+        Factory-manufactured elements, assembled on site in days.
       </p>
       <p className="hero-sub" data-hero-item>
         Scroll to raise the building — element by precast element.
@@ -74,7 +74,7 @@ export function CtaPanel({ onExit }: { onExit: () => void }) {
   return (
     <div ref={ref} className="cta-panel" style={{ opacity: 0, pointerEvents: "none" }}>
       <p className="caption-kicker">Bhaarat Precast</p>
-      <h2>Build faster. Build precise.</h2>
+      <h2>Build faster. Build with precision.</h2>
       <p className="caption-body">
         Every element you just walked past was cast, cured and quality-checked
         before it ever saw the site.

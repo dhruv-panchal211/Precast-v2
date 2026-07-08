@@ -80,7 +80,7 @@ export const PHASES: PhaseDef[] = [
     caption: {
       kicker: "Phase 02 — Structure",
       title: "Precast RCC Columns",
-      spec: "420 × 420 MM · CORBELLED · C60",
+      spec: "420 × 420 MM · PRECAST RCC · C60",
       body: "High-strength columns slot into grouted sleeves — plumb, braced and load-bearing the day they are set.",
     },
   },
@@ -92,7 +92,7 @@ export const PHASES: PhaseDef[] = [
       kicker: "Phase 03 — Structure",
       title: "Prestressed Beams",
       spec: "SPANS TO 12 M · L/480 DEFLECTION",
-      body: "Main and secondary beams lower onto column corbels, closing the floor frame in hours, not weeks.",
+      body: "Main and secondary beams lower onto the column heads, closing the floor frame in hours, not weeks.",
     },
   },
   {
@@ -125,7 +125,7 @@ export const PHASES: PhaseDef[] = [
       kicker: "Phase 06 — Access",
       title: "Precast Staircase",
       spec: "MONOLITHIC FLIGHT + LANDING",
-      body: "Single-piece cast flights slot into the core — walkable the moment the crane lets go.",
+      body: "Single-piece cast flights slot into the core — ready for use as soon as they are installed.",
     },
   },
   {
@@ -136,7 +136,7 @@ export const PHASES: PhaseDef[] = [
       kicker: "Phase 07 — Repetition",
       title: "Floor After Floor",
       spec: "1 STOREY ≈ 5 WORKING DAYS",
-      body: "The same engineered kit of parts stacks skyward — precision repeated without scaffolding the sky.",
+      body: "The same engineered kit of parts, repeated floor after floor — consistent quality without on-site formwork.",
     },
   },
   {
@@ -147,7 +147,7 @@ export const PHASES: PhaseDef[] = [
       kicker: "Phase 08 — Completion",
       title: "Fully Precast. Fully Engineered.",
       spec: "ROOF SLABS + PARAPET · WATERTIGHT",
-      body: "Capping panels close the envelope. Every element on this building left a factory, not a formwork yard.",
+      body: "Capping panels close the envelope. Every element of this building was factory-manufactured and quality-assured before reaching site.",
     },
   },
   {
@@ -166,8 +166,8 @@ export const PHASES: PhaseDef[] = [
     caption: {
       kicker: "Inside — 01",
       title: "Precast Columns",
-      spec: "FACTORY-CAST RCC · CORBELLED",
-      body: "High-strength columns with cast-in corbels — erected crane-to-grout with no shoring, no waiting.",
+      spec: "FACTORY-CAST RCC · GROUTED HEAD",
+      body: "High-strength precast columns erected crane-to-grout — no shoring, no waiting.",
     },
   },
   {
@@ -205,7 +205,7 @@ export const PHASES: PhaseDef[] = [
     caption: {
       kicker: "Inside — 04",
       title: "Precast Staircase",
-      spec: "ONE POUR · ZERO PROPPING",
+      spec: "SINGLE-CAST · ZERO PROPPING",
       body: "Single-piece cast flights and landings — safe vertical access from the first day of erection.",
     },
   },

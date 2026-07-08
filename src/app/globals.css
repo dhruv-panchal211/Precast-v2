@@ -337,7 +337,9 @@ a:hover {
   max-width: 18ch;
 }
 .intro-line em {
-  font-style: italic;
+  /* Space Grotesk has no italic — emphasis via colour + underline accent */
+  font-style: normal;
+  font-weight: 500;
   color: var(--brand-navy);
   position: relative;
 }
@@ -446,7 +448,8 @@ a:hover {
   margin: 1rem 0 0.5rem;
 }
 .hero-title h1 em {
-  font-style: italic;
+  font-style: normal;
+  font-weight: 500;
   color: var(--brand-navy);
   position: relative;
 }
@@ -1047,5 +1050,264 @@ a:hover {
   }
   .about-head {
     position: static;
+  }
+}
+
+/* ------------------------------- loader ----------------------------- */
+
+/* Page frozen while the loader is up. */
+html.is-loading {
+  overflow: hidden;
+}
+
+.site-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--concrete-white);
+  /* hairline "ground" at the bottom of the sheet, visible during the wipe */
+  border-bottom: 1px solid var(--line);
+}
+
+.site-loader-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(9, 27, 95, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(9, 27, 95, 0.05) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, #000 0%, transparent 76%);
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, #000 0%, transparent 76%);
+}
+
+.site-loader-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  text-align: center;
+  padding: 0 1.5rem;
+}
+
+/* Construction scene — a tower crane assembling the building panel by
+   panel. Pure CSS transforms/opacity, one 8.4 s master loop = three crane
+   trips (bottom, middle, top storey), then a short "topped-out" hold. */
+.loader-mark {
+  width: clamp(230px, 34vw, 340px);
+  color: var(--brand-navy);
+  overflow: visible;
+}
+
+/* static structure */
+.loader-mark .cl-ground {
+  stroke: var(--line);
+  stroke-width: 2;
+}
+.loader-mark .cl-pad {
+  fill: rgba(9, 27, 95, 0.08);
+}
+.loader-mark .cl-mast,
+.loader-mark .cl-jib {
+  fill: rgba(9, 27, 95, 0.05);
+  stroke: var(--brand-navy);
+  stroke-width: 1.5;
+}
+.loader-mark .cl-brace,
+.loader-mark .cl-tie {
+  stroke: var(--brand-accent-soft);
+  stroke-width: 1;
+  opacity: 0.7;
+}
+.loader-mark .cl-cap {
+  stroke: var(--brand-navy);
+  stroke-width: 1.5;
+}
+.loader-mark .cl-base,
+.loader-mark .cl-weight,
+.loader-mark .cl-trolley,
+.loader-mark .cl-cable,
+.loader-mark .cl-hook {
+  fill: var(--brand-navy);
+}
+.loader-mark .cl-beacon {
+  fill: var(--brand-accent-soft);
+  animation: cl-beacon 2.4s ease-in-out infinite;
+}
+
+/* the moving parts */
+.loader-mark .cl-carrier {
+  transform: translateX(78px);
+  animation: cl-carrierX 8.4s cubic-bezier(0.5, 0.05, 0.2, 1) infinite;
+}
+.loader-mark .cl-cable {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: cl-cableS 8.4s cubic-bezier(0.55, 0.05, 0.3, 1) infinite;
+}
+.loader-mark .cl-hook {
+  animation: cl-liftY 8.4s cubic-bezier(0.55, 0.05, 0.3, 1) infinite;
+}
+.loader-mark .cl-lift {
+  opacity: 0;
+  animation:
+    cl-liftY 8.4s cubic-bezier(0.55, 0.05, 0.3, 1) infinite,
+    cl-carryO 8.4s linear infinite;
+}
+.loader-mark .cl-sling {
+  stroke: var(--brand-navy);
+  stroke-width: 1;
+}
+.loader-mark .cl-carry-panel {
+  fill: rgba(52, 87, 196, 0.14);
+  stroke: var(--brand-accent-soft);
+  stroke-width: 2;
+}
+.loader-mark .cl-placed {
+  fill: rgba(9, 27, 95, 0.04);
+  stroke: var(--brand-navy);
+  stroke-width: 2;
+  opacity: 1; /* static-complete when animations are off */
+}
+.loader-mark .cl-placed-1 {
+  animation: cl-p1 8.4s linear infinite;
+}
+.loader-mark .cl-placed-2 {
+  animation: cl-p2 8.4s linear infinite;
+}
+.loader-mark .cl-placed-3 {
+  animation: cl-p3 8.4s linear infinite;
+}
+
+/* trolley trips: out over the building, back to the pickup zone */
+@keyframes cl-carrierX {
+  0%, 3%       { transform: translateX(78px); }
+  10%, 26%     { transform: translateX(188px); }
+  32%, 36.6%   { transform: translateX(78px); }
+  43.7%, 59.7% { transform: translateX(188px); }
+  65.6%, 70%   { transform: translateX(78px); }
+  77%, 93%     { transform: translateX(188px); }
+  98.6%, 100%  { transform: translateX(78px); }
+}
+
+/* hook + slung panel descend to each storey (deepest first) */
+@keyframes cl-liftY {
+  0%, 10%      { transform: translateY(0); }
+  19%, 20.5%   { transform: translateY(84px); }
+  25.5%, 43.7% { transform: translateY(0); }
+  52.6%, 53.8% { transform: translateY(71px); }
+  59%, 77%     { transform: translateY(0); }
+  86%, 87.2%   { transform: translateY(58px); }
+  92.4%, 100%  { transform: translateY(0); }
+}
+
+/* cable pays out to match each drop: (10 + d) / 10 */
+@keyframes cl-cableS {
+  0%, 10%      { transform: scaleY(1); }
+  19%, 20.5%   { transform: scaleY(9.4); }
+  25.5%, 43.7% { transform: scaleY(1); }
+  52.6%, 53.8% { transform: scaleY(8.1); }
+  59%, 77%     { transform: scaleY(1); }
+  86%, 87.2%   { transform: scaleY(6.8); }
+  92.4%, 100%  { transform: scaleY(1); }
+}
+
+/* slung panel: visible while carried, released at touchdown */
+@keyframes cl-carryO {
+  0%           { opacity: 0; }
+  1.5%, 18.8%  { opacity: 1; }
+  19.6%, 33.5% { opacity: 0; }
+  35%, 52.4%   { opacity: 1; }
+  53.2%, 66.9% { opacity: 0; }
+  68.3%, 85.8% { opacity: 1; }
+  86.6%, 100%  { opacity: 0; }
+}
+
+/* storeys lock in as the slung panel releases; soft reset at loop end */
+@keyframes cl-p1 {
+  0%, 19%      { opacity: 0; }
+  19.6%, 97%   { opacity: 1; }
+  100%         { opacity: 0; }
+}
+@keyframes cl-p2 {
+  0%, 52.8%    { opacity: 0; }
+  53.4%, 97%   { opacity: 1; }
+  100%         { opacity: 0; }
+}
+@keyframes cl-p3 {
+  0%, 86%      { opacity: 0; }
+  86.6%, 97%   { opacity: 1; }
+  100%         { opacity: 0; }
+}
+
+@keyframes cl-beacon {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+
+.loader-wordmark {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.6vw, 1.8rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--brand-navy);
+}
+.loader-wordmark span {
+  color: var(--brand-accent-soft);
+}
+
+.loader-eyebrow {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--concrete-grey);
+}
+
+.loader-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 0.9rem;
+}
+.loader-track {
+  position: relative;
+  width: clamp(140px, 22vw, 220px);
+  height: 1px;
+  background: var(--line);
+  overflow: hidden;
+}
+.loader-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--brand-navy);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.loader-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--brand-navy);
+  font-variant-numeric: tabular-nums;
+  min-width: 3.2ch;
+  text-align: right;
+}
+.loader-pct {
+  color: var(--concrete-grey);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Static topped-out scene: crane idle, all three storeys in place. */
+  .loader-mark .cl-carrier,
+  .loader-mark .cl-cable,
+  .loader-mark .cl-hook,
+  .loader-mark .cl-lift,
+  .loader-mark .cl-beacon,
+  .loader-mark .cl-placed {
+    animation: none;
   }
 }

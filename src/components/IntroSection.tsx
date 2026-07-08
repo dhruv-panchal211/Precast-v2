@@ -27,9 +27,9 @@ export function IntroSection() {
         <span className="intro-eyebrow-rule" aria-hidden />
       </p>
       <h2 className="intro-line">
-        A building is not poured.
+        Precast concrete structures,
         <br />
-        It is <em>placed</em>.
+        manufactured with <em>precision</em>.
       </h2>
       <p className="intro-copy">
         We design, manufacture and erect precast concrete systems — delivering

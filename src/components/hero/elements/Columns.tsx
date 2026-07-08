@@ -1,18 +1,17 @@
 "use client";
 
 /**
- * Precast RCC columns with cast-in corbels.
- *
- * Each column is a group (shaft + two corbels facing the main-beam
- * direction) so the whole assembly cranes in as one piece — exactly how a
- * corbelled precast column arrives on site.
+ * Precast RCC columns — clean prismatic shafts with a lightly chamfered
+ * factory edge. Each column cranes in as one piece; the head laps a little
+ * into the beam soffit so the frame reads as a solid joint (no gap, no
+ * floating corbels).
  */
 
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three-stdlib";
-import { HALF_X, type Item } from "@/lib/building";
+import { type Item } from "@/lib/building";
 import { useScrollPhases } from "@/lib/useScrollPhases";
 import { applyCrane } from "./crane";
 
@@ -21,15 +20,15 @@ interface Props {
   material: THREE.MeshStandardMaterial;
 }
 
+/** Extra height blended into the beam above, so the joint has no seam. */
+const HEAD_LAP = 0.08;
+
 export function Columns({ items, material }: Props) {
   const refs = useRef<(THREE.Group | null)[]>([]);
 
-  const { shaftGeo, corbelGeo } = useMemo(() => {
+  const shaftGeo = useMemo(() => {
     const [w, h, d] = items.length ? items[0].size : [0.42, 3, 0.42];
-    return {
-      shaftGeo: new RoundedBoxGeometry(w, h, d, 1, 0.022),
-      corbelGeo: new RoundedBoxGeometry(0.3, 0.32, d * 0.82, 1, 0.018),
-    };
+    return new RoundedBoxGeometry(w, h + HEAD_LAP, d, 1, 0.03);
   }, [items]);
 
   useFrame(() => {
@@ -40,9 +39,6 @@ export function Columns({ items, material }: Props) {
       applyCrane(g, items[i].pos[1], p, items[i].window, items[i].drop);
     }
   });
-
-  const colH = items.length ? items[0].size[1] : 3;
-  const colW = items.length ? items[0].size[0] : 0.42;
 
   return (
     <group>
@@ -55,28 +51,15 @@ export function Columns({ items, material }: Props) {
           position={it.pos}
           visible={false}
         >
-          <mesh geometry={shaftGeo} material={material} castShadow receiveShadow />
-          {/* Corbels near the head, bearing the main beams (X direction).
-              Perimeter columns only carry the inward-facing corbel so
-              nothing pokes through the façade panels. */}
-          {it.pos[0] < HALF_X - 0.01 && (
-            <mesh
-              geometry={corbelGeo}
-              material={material}
-              position={[colW / 2 + 0.15, colH / 2 - 0.62, 0]}
-              castShadow
-              receiveShadow
-            />
-          )}
-          {it.pos[0] > -HALF_X + 0.01 && (
-            <mesh
-              geometry={corbelGeo}
-              material={material}
-              position={[-colW / 2 - 0.15, colH / 2 - 0.62, 0]}
-              castShadow
-              receiveShadow
-            />
-          )}
+          {/* Offset up by half the lap so the base stays on the floor and only
+              the head grows into the beam. */}
+          <mesh
+            geometry={shaftGeo}
+            material={material}
+            position={[0, HEAD_LAP / 2, 0]}
+            castShadow
+            receiveShadow
+          />
         </group>
       ))}
     </group>

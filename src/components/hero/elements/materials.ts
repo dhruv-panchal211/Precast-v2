@@ -20,7 +20,7 @@ const HIGHLIGHT = new THREE.Color("#3457c4");
 let cachedMaps: { map: THREE.Texture; roughnessMap: THREE.Texture } | null = null;
 
 /**
- * Procedural concrete: fine noise mottle, faint pour banding and sparse
+ * Procedural concrete: fine noise mottle, faint casting banding and sparse
  * darker form-tie marks. Crisp and factory-like, not site-rough.
  */
 function concreteMaps() {

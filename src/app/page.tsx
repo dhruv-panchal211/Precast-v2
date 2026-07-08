@@ -1,3 +1,4 @@
+import { Loader } from "@/components/Loader";
 import { Nav } from "@/components/Nav";
 import { IntroSection } from "@/components/IntroSection";
 import { Hero3D } from "@/components/hero/Hero3D";
@@ -8,6 +9,7 @@ import { PHASES } from "@/lib/phases";
 export default function Home() {
   return (
     <>
+      <Loader />
       <Nav />
       <main>
         {/* Section 1 — brief intro band above the experience. */}

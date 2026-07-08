@@ -20,7 +20,7 @@ export const NZ = 3; // column lines in Z
 export const STOREYS = 3;
 export const STOREY_H = 3.6; // floor-to-floor
 export const COL_H = 3.0; // clear column height
-export const BEAM_D = 0.4; // beam depth above corbel
+export const BEAM_D = 0.4; // beam depth (bears on column head)
 export const SLAB_T = 0.22; // hollow-core plank thickness
 
 export const XS = Array.from({ length: NX }, (_, i) => (i - (NX - 1) / 2) * BAY_X); // -8..8
@@ -145,14 +145,10 @@ export function generateBuilding(): BuildingData {
     let pi = 0;
     const plinthDefs: { pos: [number, number, number]; size: [number, number, number] }[] = [];
     ZS.forEach((z) =>
-      XS.slice(0, -1).forEach((x) =>
-        plinthDefs.push({ pos: [x + BAY_X / 2, -0.2, z], size: [BAY_X - 0.5, 0.4, 0.3] }),
-      ),
+      plinthDefs.push({ pos: [0, -0.2, z], size: [HALF_X * 2, 0.4, 0.3] }),
     );
     XS.forEach((x) =>
-      ZS.slice(0, -1).forEach((z) =>
-        plinthDefs.push({ pos: [x, -0.2, z + BAY_Z / 2], size: [0.3, 0.4, BAY_Z - 0.5] }),
-      ),
+      plinthDefs.push({ pos: [x, -0.2, 0], size: [0.3, 0.4, HALF_Z * 2] }),
     );
     plinthDefs.forEach((d) => {
       plinths.push(
@@ -173,7 +169,7 @@ export function generateBuilding(): BuildingData {
       for (let px = 0; px < nPlank; px++) {
         const x = -HALF_X + plankW / 2 + px * plankW;
         plinths.push(
-          item("plinth", `gfs-${gi}`, [x, 0.11, zc], [plankW - 0.06, SLAB_T, BAY_Z - 0.4], staggerWindow(ga, gb, gi, nPlank * (NZ - 1), 0.4), 3),
+          item("plinth", `gfs-${gi}`, [x, 0.11, zc], [plankW - 0.02, SLAB_T, BAY_Z], staggerWindow(ga, gb, gi, nPlank * (NZ - 1), 0.4), 3),
         );
         gi++;
       }
@@ -204,19 +200,18 @@ export function generateBuilding(): BuildingData {
       });
     }
 
-    // Beams — mains along X on each Z line, secondaries along Z.
+    // Beams — one continuous main per Z grid line (spanning the full length in
+    // X) and one continuous secondary per X grid line (spanning the full depth
+    // in Z), bearing on the column heads. Continuous members mean the floor
+    // frame reads as one clean grid with no gaps at the joints.
     {
       const yBeam = y0 + COL_H + BEAM_D / 2;
       const defs: { pos: [number, number, number]; size: [number, number, number] }[] = [];
       ZS.forEach((z) =>
-        XS.slice(0, -1).forEach((x) =>
-          defs.push({ pos: [x + BAY_X / 2, yBeam, z], size: [BAY_X - 0.46, BEAM_D, 0.36] }),
-        ),
+        defs.push({ pos: [0, yBeam, z], size: [HALF_X * 2, BEAM_D, 0.36] }),
       );
       XS.forEach((x) =>
-        ZS.slice(0, -1).forEach((z) =>
-          defs.push({ pos: [x, yBeam, z + BAY_Z / 2], size: [0.32, BEAM_D * 0.85, BAY_Z - 0.46] }),
-        ),
+        defs.push({ pos: [x, yBeam, 0], size: [0.32, BEAM_D * 0.85, HALF_Z * 2] }),
       );
       defs.forEach((d, i) => {
         beams.push(
@@ -248,7 +243,7 @@ export function generateBuilding(): BuildingData {
               "slab",
               `slab-${s}-${i}`,
               [x, ySlab, zc],
-              [plankW - 0.06, SLAB_T, BAY_Z - 0.4],
+              [plankW - 0.02, SLAB_T, BAY_Z],
               staggerWindow(w.slabs[0], w.slabs[1], i, total, 0.4),
               3.5,
             ),
@@ -380,7 +375,7 @@ export function generateBuilding(): BuildingData {
       for (let px = 0; px < nPlank; px++) {
         const x = -HALF_X + plankW / 2 + px * plankW;
         roof.push(
-          item("roof", `rf-${i}`, [x, yRoof, zc], [plankW - 0.06, SLAB_T, BAY_Z - 0.4], staggerWindow(a, a + (b - a) * 0.7, i, total, 0.4), 4),
+          item("roof", `rf-${i}`, [x, yRoof, zc], [plankW - 0.02, SLAB_T, BAY_Z], staggerWindow(a, a + (b - a) * 0.7, i, total, 0.4), 4),
         );
         i++;
       }

@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Fraunces, Manrope, IBM_Plex_Mono } from "next/font/google";
+import { Space_Grotesk, Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-/* Display serif — refined, high-contrast, architectural. */
-const fraunces = Fraunces({
+/* Display — architectural grotesk: precise, engineered, international. */
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["300", "400", "500"],
+  weight: ["300", "400", "500", "600"],
 });
 
-/* Neutral engineered sans for body/UI. */
-const manrope = Manrope({
+/* Neutral, highly legible sans for body/UI. */
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-body",
   weight: ["300", "400", "500", "600"],
@@ -24,15 +24,26 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Bhaarat Precast — Engineered Offsite. Assembled with Certainty.",
+  title: "Bhaarat Precast | Precast Concrete Manufacturer in Ahmedabad, India",
   description:
-    "Premium precast concrete construction: columns, prestressed beams, hollow-core slabs, staircases and architectural façade panels — factory-cast, crane-set, fully engineered.",
+    "Bhaarat Precast manufactures precast concrete components — columns, prestressed beams, hollow-core slabs, staircases and architectural façade panels — with advanced German technology at its Ahmedabad, Gujarat facility.",
+  keywords: [
+    "precast concrete",
+    "precast concrete manufacturer",
+    "precast columns",
+    "prestressed beams",
+    "hollow-core slabs",
+    "precast staircase",
+    "facade panels",
+    "precast construction India",
+    "Ahmedabad",
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${fraunces.variable} ${manrope.variable} ${plexMono.variable}`}>
+      <body className={`${spaceGrotesk.variable} ${inter.variable} ${plexMono.variable}`}>
         {children}
       </body>
     </html>

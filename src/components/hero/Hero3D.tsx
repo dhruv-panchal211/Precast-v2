@@ -63,6 +63,7 @@ export function Hero3D() {
   const [reduced, setReduced] = useState(false);
   const setHeroInView = useScrollPhases((s) => s.setHeroInView);
   const setReducedMotion = useScrollPhases((s) => s.setReducedMotion);
+  const loaderDone = useScrollPhases((s) => s.loaderDone);
 
   /* Device heuristics: degrade gracefully on small screens. */
   useEffect(() => {
@@ -162,8 +163,37 @@ export function Hero3D() {
             shadows
             dpr={quality === "high" ? [1, 2] : [1, 1.5]}
             camera={{ position: [21, 3.2, 27], fov: 38, near: 0.1, far: 220 }}
-            frameloop={inView ? "always" : "never"}
+            // Keep the loop running while the loader covers the page so the
+            // expensive first frames happen out of sight, not mid-reveal.
+            frameloop={inView || !loaderDone ? "always" : "never"}
             gl={{ antialias: true, powerPreference: "high-performance" }}
+            // Warm the pipeline behind the loader, then signal ready:
+            // parallel-compile every material (non-blocking), then let two
+            // natural frames flow — the loop is already running behind the
+            // loader, so those frames build the shadow map and compile the
+            // post passes on their own schedule. No forced synchronous frame
+            // (that block was what janked the loader), and a timeout keeps
+            // hidden tabs (no rAF) from stalling readiness.
+            onCreated={(st) => {
+              const ready = () => useScrollPhases.getState().setSceneReady(true);
+              (async () => {
+                try {
+                  await st.gl.compileAsync(st.scene, st.camera);
+                  await new Promise<void>((resolve) => {
+                    const t = setTimeout(resolve, 800);
+                    requestAnimationFrame(() =>
+                      requestAnimationFrame(() => {
+                        clearTimeout(t);
+                        resolve();
+                      }),
+                    );
+                  });
+                } catch {
+                  /* warm-up is best-effort — never block readiness on it */
+                }
+                ready();
+              })();
+            }}
           >
             <Scene quality={quality} />
           </Canvas>

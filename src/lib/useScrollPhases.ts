@@ -21,9 +21,17 @@ interface ScrollPhaseState {
   heroInView: boolean;
   /** prefers-reduced-motion: static/stepped fallback. */
   reducedMotion: boolean;
+  /** True once the 3D pipeline is warmed (shaders compiled, first frame
+   *  rendered) — the real "ready" signal consumed by the site loader. */
+  sceneReady: boolean;
+  /** True once the site loader has fully exited. While false, the hero
+   *  render loop stays on so warm-up frames happen behind the loader. */
+  loaderDone: boolean;
   setProgress: (p: number) => void;
   setHeroInView: (v: boolean) => void;
   setReducedMotion: (v: boolean) => void;
+  setSceneReady: (v: boolean) => void;
+  setLoaderDone: (v: boolean) => void;
 }
 
 export const useScrollPhases = create<ScrollPhaseState>((set, get) => ({
@@ -40,6 +48,10 @@ export const useScrollPhases = create<ScrollPhaseState>((set, get) => ({
   },
   setHeroInView: (v) => set({ heroInView: v }),
   setReducedMotion: (v) => set({ reducedMotion: v }),
+  sceneReady: false,
+  loaderDone: false,
+  setSceneReady: (v) => set({ sceneReady: v }),
+  setLoaderDone: (v) => set({ loaderDone: v }),
 }));
 
 export const usePhase = () => useScrollPhases((s) => PHASES[s.phaseIndex]);

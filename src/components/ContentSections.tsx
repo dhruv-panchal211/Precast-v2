@@ -271,8 +271,9 @@ export function ContentSections() {
         <p className="section-eyebrow">Contact</p>
         <h2 className="section-title">Talk to our engineers</h2>
         <p className="contact-copy">
-          Bring us a massing model, a programme, or a problem. We will bring
-          back a precast solution with a crane schedule attached.
+          Share your project brief, drawings or programme — our engineering
+          team will respond with a complete precast solution covering design,
+          manufacturing and installation.
         </p>
         <a className="btn-primary" href="mailto:engineering@bhaaratprecast.in">
           engineering@bhaaratprecast.in
