@@ -1,4 +1,4 @@
-# Bhaarat Precast — 3D Scroll-Storytelling Site
+# Stratoform — 3D Scroll-Storytelling Site
 
 A scroll-driven cinematic experience for a precast concrete company: a
 multistory building assembles itself element by element as you scroll, then

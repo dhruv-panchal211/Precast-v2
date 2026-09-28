@@ -38,7 +38,7 @@ export function HeroTitle() {
     <div ref={ref} className="hero-title">
       <p className="hero-kicker" data-hero-item>
         <span className="hero-kicker-dot" aria-hidden />
-        Bhaarat Precast
+        Stratoform
       </p>
       <h1 data-hero-item>
         Engineered off-site.
@@ -73,7 +73,7 @@ export function CtaPanel({ onExit }: { onExit: () => void }) {
 
   return (
     <div ref={ref} className="cta-panel" style={{ opacity: 0, pointerEvents: "none" }}>
-      <p className="caption-kicker">Bhaarat Precast</p>
+      <p className="caption-kicker">Stratoform</p>
       <h2>Build faster. Build with precision.</h2>
       <p className="caption-body">
         Every element you just walked past was cast, cured and quality-checked

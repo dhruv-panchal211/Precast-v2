@@ -24,9 +24,9 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Bhaarat Precast | Precast Concrete Manufacturer in Ahmedabad, India",
+  title: "Stratoform | Precast Concrete Manufacturer in Ahmedabad, India",
   description:
-    "Bhaarat Precast manufactures precast concrete components — columns, prestressed beams, hollow-core slabs, staircases and architectural façade panels — with advanced German technology at its Ahmedabad, Gujarat facility.",
+    "Stratoform manufactures precast concrete components — columns, prestressed beams, hollow-core slabs, staircases and architectural façade panels — with advanced German technology at its Ahmedabad, Gujarat facility.",
   keywords: [
     "precast concrete",
     "precast concrete manufacturer",

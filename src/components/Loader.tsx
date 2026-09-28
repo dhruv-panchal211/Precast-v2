@@ -155,7 +155,7 @@ export function Loader() {
   if (gone) return null;
 
   return (
-    <div ref={rootRef} className="site-loader" role="status" aria-label="Loading Bhaarat Precast">
+    <div ref={rootRef} className="site-loader" role="status" aria-label="Loading Stratoform">
       <div className="site-loader-grid" aria-hidden />
       <div ref={innerRef} className="site-loader-inner">
         {/* Tower crane erecting a precast building, one panel per trip:
@@ -206,7 +206,7 @@ export function Loader() {
         </svg>
 
         <p className="loader-wordmark">
-          Bhaarat<span>Precast</span>
+          Strato<span>form</span>
         </p>
         <p className="loader-eyebrow">Precast Concrete · Preparing the site</p>
 

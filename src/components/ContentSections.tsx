@@ -1,9 +1,11 @@
 /**
- * Sections 3+ — the Bhaarat Precast story: about, facility, components,
- * industries, why precast, the advantage and contact. Same tokens, same
- * restraint as the hero — now with iconography and light graphics.
+ * Sections 3+ — the Stratoform story: about, facility, components,
+ * industries, why precast, the advantage and contact. Every section opens
+ * with the same numbered editorial header, then takes its own layout so
+ * the page reads as a sequence rather than a stack of identical blocks.
  */
 
+import type { ReactNode } from "react";
 import { Icon } from "./icons";
 
 const STATS = [
@@ -84,6 +86,32 @@ const ADVANTAGES = [
   "Custom engineering solutions",
 ];
 
+/** Numbered editorial header shared by every content section. */
+function SectionHead({
+  index,
+  eyebrow,
+  title,
+  lede,
+}: {
+  index: string;
+  eyebrow: string;
+  title: ReactNode;
+  lede?: ReactNode;
+}) {
+  return (
+    <header className="section-head">
+      <div className="section-head-main">
+        <p className="section-eyebrow">
+          <span className="section-index">{index}</span>
+          {eyebrow}
+        </p>
+        <h2 className="section-title">{title}</h2>
+      </div>
+      {lede && <p className="section-lede">{lede}</p>}
+    </header>
+  );
+}
+
 /** Decorative blueprint-style graphic used in the About section. */
 function FacilityGraphic() {
   return (
@@ -112,10 +140,13 @@ function FacilityGraphic() {
 export function ContentSections() {
   return (
     <>
-      {/* About */}
+      {/* 01 — About */}
       <section className="content-section about" id="about">
         <div className="about-head">
-          <p className="section-eyebrow">About Bhaarat Precast</p>
+          <p className="section-eyebrow">
+            <span className="section-index">01</span>
+            About Stratoform
+          </p>
           <h2 className="section-title">
             Building the future with precision precast
           </h2>
@@ -127,27 +158,32 @@ export function ContentSections() {
             German technology — delivering speed, quality, and sustainability
             for modern construction.
           </p>
-          <p>
-            Bhaarat Precast is establishing a state-of-the-art precast
-            manufacturing facility in <strong>Ahmedabad, Gujarat</strong>.
-            Founded with a vision to transform construction through
-            high-precision precast concrete technology, the company integrates
-            advanced European manufacturing technology with deep EPC execution
-            expertise.
-          </p>
-          <p>
-            Our upcoming facility will produce a comprehensive range of precast
-            structural and architectural components to serve diverse sectors of
-            infrastructure and real estate across India.
-          </p>
+          <div className="about-cols">
+            <p>
+              Stratoform is establishing a state-of-the-art precast
+              manufacturing facility in <strong>Ahmedabad, Gujarat</strong>.
+              Founded with a vision to transform construction through
+              high-precision precast concrete technology, the company
+              integrates advanced European manufacturing technology with deep
+              EPC execution expertise.
+            </p>
+            <p>
+              Our upcoming facility will produce a comprehensive range of
+              precast structural and architectural components to serve diverse
+              sectors of infrastructure and real estate across India.
+            </p>
+          </div>
           <div className="status-note">
             <span className="status-dot" aria-hidden />
-            <p>
-              The facility is currently undergoing installation and
-              commissioning of advanced German equipment. During the initial
-              phase, Bhaarat Precast will support its group&apos;s ongoing
-              projects before expanding supply to external clients.
-            </p>
+            <div>
+              <p className="status-label">Facility status · Commissioning</p>
+              <p>
+                The facility is currently undergoing installation and
+                commissioning of advanced German equipment. During the initial
+                phase, Stratoform will support its group&apos;s ongoing
+                projects before expanding supply to external clients.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -162,65 +198,81 @@ export function ContentSections() {
         ))}
       </section>
 
-      {/* Facility */}
-      <section className="content-section alt" id="facility">
-        <p className="section-eyebrow">Our Manufacturing Facility</p>
-        <h2 className="section-title">A modern precast manufacturing ecosystem</h2>
-        <p className="contact-copy">
-          Designed to meet global standards in precision manufacturing, quality
-          assurance, and production efficiency.
-        </p>
-        <ul className="feature-grid">
-          {FACILITY.map((f) => (
-            <li key={f} className="feature-item">
-              <span className="feature-tick" aria-hidden />
-              {f}
+      {/* 02 — Facility */}
+      <section className="content-section" id="facility">
+        <SectionHead
+          index="02"
+          eyebrow="Our Manufacturing Facility"
+          title="A modern precast manufacturing ecosystem"
+          lede="Designed to meet global standards in precision manufacturing, quality assurance, and production efficiency."
+        />
+        <ol className="spec-list">
+          {FACILITY.map((f, i) => (
+            <li key={f} className="spec-item">
+              <span className="spec-n">{String(i + 1).padStart(2, "0")}</span>
+              <span>{f}</span>
             </li>
           ))}
-        </ul>
+        </ol>
       </section>
 
-      {/* Components */}
-      <section className="content-section" id="components">
-        <p className="section-eyebrow">Precast Components We Manufacture</p>
-        <h2 className="section-title">Complete range of structural precast solutions</h2>
+      {/* 03 — Components */}
+      <section className="content-section alt" id="components">
+        <SectionHead
+          index="03"
+          eyebrow="Precast Components We Manufacture"
+          title="Complete range of structural precast solutions"
+          lede="Nine component families, cast to drawing in a controlled factory environment and delivered site-ready."
+        />
 
-        <div className="component-block">
-          <h3 className="component-heading">Structural Components</h3>
-          <ul className="icon-grid">
-            {STRUCTURAL.map((c) => (
-              <li key={c.label} className="icon-card">
-                <span className="icon-badge">
-                  <Icon name={c.icon} />
-                </span>
-                <span>{c.label}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <div className="catalog">
+          <div className="catalog-group">
+            <h3 className="component-heading">
+              Structural <span>{STRUCTURAL.length} types</span>
+            </h3>
+            <ul className="catalog-grid">
+              {STRUCTURAL.map((c, i) => (
+                <li key={c.label} className="catalog-tile">
+                  <span className="catalog-code">S-{String(i + 1).padStart(2, "0")}</span>
+                  <span className="icon-badge">
+                    <Icon name={c.icon} />
+                  </span>
+                  <span className="catalog-label">{c.label}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        <div className="component-block">
-          <h3 className="component-heading">Architectural &amp; Custom Components</h3>
-          <ul className="icon-grid">
-            {ARCHITECTURAL.map((c) => (
-              <li key={c.label} className="icon-card">
-                <span className="icon-badge">
-                  <Icon name={c.icon} />
-                </span>
-                <span>{c.label}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="catalog-group catalog-group-dark">
+            <h3 className="component-heading">
+              Architectural &amp; Custom <span>{ARCHITECTURAL.length} types</span>
+            </h3>
+            <ul className="catalog-grid catalog-grid-stack">
+              {ARCHITECTURAL.map((c, i) => (
+                <li key={c.label} className="catalog-tile">
+                  <span className="catalog-code">A-{String(i + 1).padStart(2, "0")}</span>
+                  <span className="icon-badge">
+                    <Icon name={c.icon} />
+                  </span>
+                  <span className="catalog-label">{c.label}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
-      {/* Industries */}
-      <section className="content-section alt" id="industries">
-        <p className="section-eyebrow">Industries We Serve</p>
-        <h2 className="section-title">Supporting high-performance infrastructure projects</h2>
-        <ul className="icon-grid">
+      {/* 04 — Industries */}
+      <section className="content-section" id="industries">
+        <SectionHead
+          index="04"
+          eyebrow="Industries We Serve"
+          title="Supporting high-performance infrastructure projects"
+          lede="From hospitality to hyperscale — precast suits any programme where speed, repetition and quality matter."
+        />
+        <ul className="industry-grid">
           {INDUSTRIES.map((i) => (
-            <li key={i.label} className="icon-card">
+            <li key={i.label} className="industry-cell">
               <span className="icon-badge">
                 <Icon name={i.icon} />
               </span>
@@ -230,17 +282,24 @@ export function ContentSections() {
         </ul>
       </section>
 
-      {/* Why precast */}
-      <section className="content-section" id="why">
-        <p className="section-eyebrow">Why Precast Construction?</p>
-        <h2 className="section-title">Transforming the way modern buildings are built</h2>
+      {/* 05 — Why precast */}
+      <section className="content-section alt" id="why">
+        <SectionHead
+          index="05"
+          eyebrow="Why Precast Construction?"
+          title="Transforming the way modern buildings are built"
+        />
         <div className="services-grid">
           {WHY.map((w) => (
             <article key={w.n} className="service-card">
-              <div className="service-icon">
-                <Icon name={w.icon} />
+              <div className="service-top">
+                <div className="service-icon">
+                  <Icon name={w.icon} />
+                </div>
+                <p className="service-num" aria-hidden>
+                  {w.n}
+                </p>
               </div>
-              <p className="service-num">{w.n}</p>
               <h3>{w.title}</h3>
               <p>{w.body}</p>
             </article>
@@ -248,14 +307,14 @@ export function ContentSections() {
         </div>
       </section>
 
-      {/* Advantage */}
-      <section className="content-section alt" id="advantage">
-        <p className="section-eyebrow">The Bhaarat Precast Advantage</p>
-        <h2 className="section-title">Delivering value through engineering excellence</h2>
-        <p className="contact-copy">
-          We combine manufacturing technology, EPC expertise, and project
-          execution knowledge to deliver exceptional value to clients.
-        </p>
+      {/* 06 — Advantage (dark band) */}
+      <section className="content-section dark" id="advantage">
+        <SectionHead
+          index="06"
+          eyebrow="The Stratoform Advantage"
+          title="Delivering value through engineering excellence"
+          lede="We combine manufacturing technology, EPC expertise, and project execution knowledge to deliver exceptional value to clients."
+        />
         <ul className="feature-grid">
           {ADVANTAGES.map((a) => (
             <li key={a} className="feature-item">
@@ -266,18 +325,34 @@ export function ContentSections() {
         </ul>
       </section>
 
-      {/* Contact */}
-      <section className="content-section" id="contact">
-        <p className="section-eyebrow">Contact</p>
-        <h2 className="section-title">Talk to our engineers</h2>
-        <p className="contact-copy">
-          Share your project brief, drawings or programme — our engineering
-          team will respond with a complete precast solution covering design,
-          manufacturing and installation.
-        </p>
-        <a className="btn-primary" href="mailto:engineering@bhaaratprecast.in">
-          engineering@bhaaratprecast.in
-        </a>
+      {/* 07 — Contact */}
+      <section className="content-section contact" id="contact">
+        <div className="contact-main">
+          <p className="section-eyebrow">
+            <span className="section-index">07</span>
+            Contact
+          </p>
+          <h2 className="contact-title">
+            Talk to our <em>engineers</em>.
+          </h2>
+          <p className="contact-copy">
+            Share your project brief, drawings or programme — our engineering
+            team will respond with a complete precast solution covering design,
+            manufacturing and installation.
+          </p>
+        </div>
+        <div className="contact-card">
+          <p className="contact-card-label">Send us</p>
+          <ul className="contact-checklist">
+            <li>Project brief &amp; location</li>
+            <li>Architectural / structural drawings</li>
+            <li>Construction programme</li>
+          </ul>
+          <a className="btn-primary btn-block" href="mailto:engineering@stratoform.in">
+            engineering@stratoform.in
+          </a>
+          <p className="contact-card-meta">Ahmedabad, Gujarat · India</p>
+        </div>
       </section>
     </>
   );
