@@ -30,6 +30,16 @@ export const HALF_X = ((NX - 1) * BAY_X) / 2; // 8
 export const HALF_Z = ((NZ - 1) * BAY_Z) / 2; // 5
 export const ROOF_Y = STOREYS * STOREY_H; // 10.8
 
+/* Stair core (rear-right bay). Flights run in X between the floor landing
+   (east, against the x = 8 beam) and the half landing (west). */
+const STAIR_X = 6.2; // core centre x
+const STAIR_Z = -2.5; // core centre z (rear bay)
+const FLIGHT_RUN = 2.6;
+const FLIGHT_TOP_X = STAIR_X - 0.65 + FLIGHT_RUN / 2; // 6.85 — where flights meet the floor
+const WELL_X0 = 3.2; // west edge of the omitted planks
+const WELL_Z0 = STAIR_Z - 1.35; // −3.85 — outer face of flight 2
+const WELL_Z1 = STAIR_Z + 1.35; // −1.15 — outer face of flight 1
+
 /* ------------------------------ items ------------------------------ */
 
 export type Kind =
@@ -232,9 +242,21 @@ export function generateBuilding(): BuildingData {
         const zc = ZS[zi] + BAY_Z / 2;
         for (let px = 0; px < nPlank; px++) {
           const x = -HALF_X + plankW / 2 + px * plankW;
-          // Stairwell void: omit planks over the stair core (rear-right bay)
-          // so the flights land in a real well, visible from above.
+          // Stairwell: the three planks over the stair core are replaced by
+          // an opening cut to the flights' footprint — two infill strips
+          // either side close the floor right up to the stair edges (the
+          // floor landing itself is placed with the stairs below).
           if (zi === 0 && x > 3.1 && x < 7.3) {
+            if (x < 4.5) {
+              const win = staggerWindow(w.slabs[0], w.slabs[1], i, total, 0.4);
+              const sw = FLIGHT_TOP_X - WELL_X0; // 3.65
+              const cx = WELL_X0 + sw / 2;
+              const zb = -HALF_Z; // −5, the rear beam line
+              slabs.push(
+                item("slab", `slab-${s}-sw-a`, [cx, ySlab, (zb + WELL_Z0) / 2], [sw, SLAB_T, WELL_Z0 - zb], win, 3.5),
+                item("slab", `slab-${s}-sw-b`, [cx, ySlab, WELL_Z1 / 2], [sw, SLAB_T, -WELL_Z1], win, 3.5),
+              );
+            }
             i++;
             continue;
           }
@@ -255,9 +277,18 @@ export function generateBuilding(): BuildingData {
 
     // Façade panels — 5 per long side, 4 per short side. Door + window voids
     // are modelled as split panel pieces so openings are real geometry.
+    // Panels fill the full module (only a 4 mm sealed joint, read through
+    // the chamfer) and run floor-to-floor, so the envelope has no open
+    // seams; the top storey runs up to meet the parapet.
     {
-      const panelH = STOREY_H - 0.25;
-      const yP = y0 + panelH / 2 + 0.05;
+      const JOINT = 0.004;
+      const base = y0 + JOINT / 2;
+      const top =
+        s < STOREYS - 1
+          ? y0 + STOREY_H
+          : (STOREYS - 1) * STOREY_H + COL_H + BEAM_D + SLAB_T; // roof deck top
+      const panelH = top - base - JOINT / 2;
+      const yP = base + panelH / 2;
       const t = 0.16;
       let i = 0;
       const defs: {
@@ -276,14 +307,14 @@ export function generateBuilding(): BuildingData {
           // Entrance sits mid-bay (clear of the column lines at x=0 and x=4).
           const isDoor = front && s === 0 && k === 3;
           const isWin = front && !isDoor && (k === 1 || k === 2);
-          defs.push({ pos: [x, yP, zSide], size: [3.15, panelH, t], door: isDoor, window: isWin });
+          defs.push({ pos: [x, yP, zSide], size: [3.2 - JOINT, panelH, t], door: isDoor, window: isWin });
         }
       }
       // Short sides: 4 panels of 2.5 m.
       for (const xSide of [HALF_X + t / 2 + 0.05, -HALF_X - t / 2 - 0.05]) {
         for (let k = 0; k < 4; k++) {
           const z = -HALF_Z + 1.25 + k * 2.5;
-          defs.push({ pos: [xSide, yP, z], size: [2.45, panelH, t], rotY: Math.PI / 2 });
+          defs.push({ pos: [xSide, yP, z], size: [2.5 - JOINT, panelH, t], rotY: Math.PI / 2 });
         }
       }
 
@@ -339,11 +370,13 @@ export function generateBuilding(): BuildingData {
       });
     }
 
-    // Staircase — dog-leg in the rear-right bay. Two flights + half landing.
-    // The top storey has no flight (the roof deck above the core is solid).
+    // Staircase — dog-leg in the rear-right bay. Two flights, a half landing
+    // and a floor landing at the next level where flight 2 arrives (and the
+    // next storey's flight 1 starts). The top storey has no flight (the roof
+    // deck above the core is solid).
     if (s < STOREYS - 1) {
-      const sx = 6.2; // stair core centre x
-      const sz = -2.5; // rear bay
+      const sx = STAIR_X;
+      const sz = STAIR_Z;
       const [a, b] = w.stairs;
       const halfH = STOREY_H / 2;
       // Flight 1: rises +x→−x from floor to half landing.
@@ -358,6 +391,16 @@ export function generateBuilding(): BuildingData {
       stairs.push(
         item("stair", `st-${s}-f2`, [sx - 0.65, y0 + halfH, sz - 0.75], [2.6, halfH, 1.2], [a + (b - a) * 0.5, b], 6, { dir: -1 }),
       );
+      // Floor landing — one plank-thick slab flush with the next floor,
+      // from the head of the flights to the x = 8 beam, full bay depth.
+      {
+        const lx0 = FLIGHT_TOP_X - 0.05; // laps under the top tread
+        const lw = HALF_X - lx0;
+        const ySlab = y0 + COL_H + BEAM_D + SLAB_T / 2;
+        stairs.push(
+          item("stair", `st-${s}-fl`, [lx0 + lw / 2, ySlab, -HALF_Z / 2], [lw, SLAB_T, HALF_Z], [a + (b - a) * 0.6, b], 5),
+        );
+      }
     }
   }
 
