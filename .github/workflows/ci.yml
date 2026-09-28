@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  # A newer push supersedes an in-flight run, but never cancels a deploy midway.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Typecheck & build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Matches the VPS (v25.x) so version-specific breakage shows up here,
+          # not at deploy time.
+          node-version: "25"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        # Proves the commit compiles; the artifact that is actually served is
+        # built on the VPS by scripts/deploy.sh.
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  deploy:
+    name: Deploy to VPS
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      # Never let two deploys touch the server at once.
+      group: deploy-stratoform
+      cancel-in-progress: false
+    environment:
+      name: production
+      url: https://stratoform.teknith.com
+
+    steps:
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+
+      - name: Deploy
+        # The deploy key is pinned on the server to a forced command
+        # (/usr/local/bin/stratoform-deploy): it fetches origin/main, resets
+        # to it and runs scripts/deploy.sh. The key cannot run anything else,
+        # so the remote command sent here is ignored.
+        run: ssh -o BatchMode=yes "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" deploy
+
+      - name: Verify the deployed site
+        run: |
+          for i in $(seq 1 10); do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' https://stratoform.teknith.com/ || true)
+            if [ "$code" = "200" ]; then echo "live (HTTP $code)"; exit 0; fi
+            echo "attempt $i: HTTP $code"; sleep 5
+          done
+          echo "site did not return 200 after deploy"; exit 1
