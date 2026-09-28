@@ -5,16 +5,42 @@
  * post — everything scroll-driven, nothing on autoplay.
  */
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { useThree } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import * as THREE from "three";
 import { Building } from "./Building";
 import { CameraRig } from "./CameraRig";
 import { Lighting } from "./Lighting";
 import { Effects } from "./Effects";
+import { useScrollPhases } from "@/lib/useScrollPhases";
 
 /** Page background — canvas fog fades the ground plane into the page. */
 const BG = "#f6f5f2";
+
+/**
+ * The canvas renders on demand: a frame is requested only when scroll
+ * progress changes or the hero comes back into view. Damped consumers
+ * (camera, highlight fades) request further frames until they settle, so an
+ * idle page costs no GPU time at all.
+ */
+function DemandDriver() {
+  const invalidate = useThree((s) => s.invalidate);
+  // Re-render once whenever the loop mode flips (e.g. never → demand as the
+  // hero scrolls back into view), so the stage is never left stale.
+  const frameloop = useThree((s) => s.frameloop);
+  useEffect(() => {
+    invalidate();
+  }, [invalidate, frameloop]);
+  useEffect(
+    () =>
+      useScrollPhases.subscribe((s, prev) => {
+        if (s.progress !== prev.progress || (s.heroInView && !prev.heroInView)) invalidate();
+      }),
+    [invalidate],
+  );
+  return null;
+}
 
 function Site() {
   const groundGeo = useMemo(() => new THREE.CircleGeometry(90, 48), []);
@@ -40,6 +66,7 @@ export function Scene({ quality }: { quality: "high" | "low" }) {
       <color attach="background" args={[BG]} />
       <fog attach="fog" args={[BG, 55, 130]} />
 
+      <DemandDriver />
       <CameraRig />
       <Lighting quality={quality} />
 

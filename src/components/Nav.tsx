@@ -15,6 +15,7 @@ const LINKS = [
   { href: "#components", idx: "03", label: "Components" },
   { href: "#industries", idx: "04", label: "Industries" },
   { href: "#why", idx: "05", label: "Why precast" },
+  { href: "#compare", idx: "06", label: "Compare" },
 ];
 
 export function Nav() {

@@ -17,6 +17,8 @@ import { PrecastBoxes } from "./elements/PrecastBoxes";
 import { Columns } from "./elements/Columns";
 import { Staircase } from "./elements/Staircase";
 
+const tmpColor = new THREE.Color();
+
 const KINDS: Kind[] = [
   "footing",
   "plinth",
@@ -40,11 +42,12 @@ export function Building() {
 
   // Highlight director: drives emissive + dimming toward the current
   // interior stop's element kind. Smoothed with frame-rate-independent damp.
-  useFrame((_, dt) => {
+  useFrame(({ invalidate }, rawDt) => {
     const { phaseIndex } = useScrollPhases.getState();
     const phase = PHASES[phaseIndex];
     const highlight = phase.interior ? phase.highlight : undefined;
-    const k = damp(6, dt);
+    const k = damp(6, Math.min(rawDt, 1 / 30));
+    let settling = false;
     for (const kind of KINDS) {
       const mat = materials[kind];
       const isHi = highlight === kind || (highlight === "roof" && kind === "parapet");
@@ -52,8 +55,17 @@ export function Building() {
       mat.emissiveIntensity += (targetEmissive - mat.emissiveIntensity) * k;
       const base = baseColors.get(kind)!;
       const dim = highlight && !isHi ? 0.8 : 1;
-      mat.color.lerp(new THREE.Color(base.r * dim, base.g * dim, base.b * dim), k);
+      tmpColor.setRGB(base.r * dim, base.g * dim, base.b * dim);
+      mat.color.lerp(tmpColor, k);
+      if (
+        Math.abs(targetEmissive - mat.emissiveIntensity) > 1e-3 ||
+        Math.abs(mat.color.r - tmpColor.r) > 1e-3
+      ) {
+        settling = true;
+      }
     }
+    // Demand rendering: keep frames coming until every fade has landed.
+    if (settling) invalidate();
   });
 
   return (

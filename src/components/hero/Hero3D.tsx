@@ -93,7 +93,9 @@ export function Hero3D() {
       return;
     }
 
-    const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 0.9 });
+    // Snappier than Lenis' default (0.1): smooth wheel input, but the page
+    // settles quickly once input stops instead of gliding on.
+    const lenis = new Lenis({ lerp: 0.16, wheelMultiplier: 1 });
     lenisRef.current = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);
@@ -116,6 +118,15 @@ export function Hero3D() {
       lenisRef.current = null;
     };
   }, [reduced]);
+
+  /* The track height depends on `quality`, which is only known after mount
+     (it starts "high" and drops to "low" on small screens). ScrollTrigger
+     measured the first height, so re-measure whenever it changes — without
+     this, phones scroll through the shorter track against the taller one's
+     start/end and never reach the interior. */
+  useEffect(() => {
+    ScrollTrigger.refresh();
+  }, [quality]);
 
   /* Only run the render loop while the hero is on screen. */
   useEffect(() => {
@@ -161,12 +172,18 @@ export function Hero3D() {
         <Suspense fallback={<div className="hero3d-loading">Preparing the site…</div>}>
           <Canvas
             shadows
-            dpr={quality === "high" ? [1, 2] : [1, 1.5]}
+            // Fill-rate is the budget: cap device-pixel-ratio (a 2× retina
+            // canvas is ~4× the pixels through every post pass).
+            dpr={quality === "high" ? [1, 1.5] : [1, 1.25]}
             camera={{ position: [21, 3.2, 27], fov: 38, near: 0.1, far: 220 }}
             // Keep the loop running while the loader covers the page so the
             // expensive first frames happen out of sight, not mid-reveal.
-            frameloop={inView || !loaderDone ? "always" : "never"}
-            gl={{ antialias: true, powerPreference: "high-performance" }}
+            // After that, render on demand only (see DemandDriver) and not
+            // at all while the hero is off screen.
+            frameloop={!loaderDone ? "always" : inView ? "demand" : "never"}
+            // The composer renders into its own (multisampled) target, so
+            // antialiasing the default framebuffer would be wasted work.
+            gl={{ antialias: false, powerPreference: "high-performance" }}
             // Warm the pipeline behind the loader, then signal ready:
             // parallel-compile every material (non-blocking), then let two
             // natural frames flow — the loop is already running behind the

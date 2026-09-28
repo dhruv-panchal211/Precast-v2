@@ -4,6 +4,7 @@ const EXPLORE = [
   { href: "#components", label: "Components" },
   { href: "#industries", label: "Industries" },
   { href: "#why", label: "Why precast" },
+  { href: "#compare", label: "Precast vs traditional" },
 ];
 
 export function Footer() {

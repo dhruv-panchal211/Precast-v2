@@ -308,8 +308,16 @@ export const CAMERA_KEYS: CamKey[] = [
   { p: 0.78,  pos: [-4.5, 1.7, -0.5], look: [-2, 3.15, -2.5],   fov: 50 }, // beams overhead
   { p: 0.828, pos: [1.5, 1.9, -1],    look: [3.5, 3.4, -2.5],   fov: 50 }, // slab soffit
   { p: 0.878, pos: [1.2, 1.9, 1.6],   look: [5.6, 2.2, -2.6],   fov: 50 }, // staircase dog-leg
-  { p: 0.924, pos: [1.5, 1.8, -2],    look: [-2, 1.8, 4.9],     fov: 50 }, // facade panels (inner face)
-  { p: 0.96,  pos: [-1, 1.6, 0.5],    look: [0, 4.5, -1],       fov: 52 }, // roof soffit / upward
-  // CTA — settle into a calm interior frame toward the light of the door.
-  { p: 1.0,   pos: [-1.5, 1.8, -2.5], look: [0.5, 1.9, 6],      fov: 46 },
+  // Façade panels — from the rear bay, on a sightline clear of the x = 0 /
+  // x = 4 column lines, taking in the whole inner face of the front wall:
+  // windows, door and panel joints.
+  { p: 0.924, pos: [2.0, 1.7, -3.0],  look: [0.8, 1.6, 5],      fov: 56 },
+  // Walk back out through the entrance (door mid-bay at x≈2.8)…
+  { p: 0.938, pos: [2.8, 1.8, 3.2],   look: [2.8, 1.9, 12],     fov: 50 },
+  { p: 0.948, pos: [2.8, 1.9, 7.8],   look: [2.8, 2.6, 16],     fov: 46 },
+  // …and rise over the building: the roof deck and parapet are only
+  // visible from above, so the roof stop is an aerial.
+  { p: 0.962, pos: [15, 19, 21],      look: [0, 9.6, 0],        fov: 40 },
+  // CTA — settle on a calm three-quarter view of the finished building.
+  { p: 1.0,   pos: [20, 11, 28],      look: [0, 5.2, 0],        fov: 38 },
 ];

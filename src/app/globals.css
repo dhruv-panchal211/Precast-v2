@@ -1322,6 +1322,333 @@ section[id] {
   color: var(--concrete-grey);
 }
 
+/* ---------------------- precast vs traditional ---------------------- */
+
+.compare-stats {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 2.5rem);
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+.compare-stat {
+  padding-top: 1.2rem;
+  border-top: 2px solid var(--brand-navy);
+}
+.compare-stat-value {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 5.5vw, 4.4rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--brand-navy);
+}
+.compare-stat-value span {
+  margin-left: 0.3rem;
+  font-size: 0.34em;
+  letter-spacing: 0;
+  color: var(--brand-accent-soft);
+}
+.compare-stat-label {
+  margin-top: 0.8rem;
+  font-weight: 500;
+  color: var(--brand-navy);
+}
+.compare-stat-sub {
+  font-size: 0.85rem;
+  font-weight: 300;
+  color: var(--concrete-grey);
+}
+
+/* Gantt pair on one shared week scale. */
+.compare-timeline {
+  --label-w: clamp(11rem, 20vw, 16rem);
+  --bar-h: 1.9rem;
+  position: relative;
+  padding: clamp(1.4rem, 3vw, 2.2rem);
+  background: var(--concrete-light);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+}
+.gantt-scale {
+  position: relative;
+  height: 1.2rem;
+  margin-left: var(--label-w);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  color: var(--concrete-grey);
+}
+.gantt-scale span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.gantt-scale span:first-child {
+  transform: none;
+}
+.gantt-scale span:last-child {
+  transform: translateX(-100%);
+}
+.gantt {
+  margin-top: 1.4rem;
+}
+.gantt-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--line);
+}
+.gantt-title {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand-navy);
+}
+.gantt-total {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--concrete-grey);
+}
+.gantt-total span {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--brand-navy);
+}
+.gantt-pre .gantt-total span {
+  color: var(--brand-accent-soft);
+}
+.gantt-body {
+  position: relative;
+}
+.gantt-rows {
+  list-style: none;
+}
+.gantt-row {
+  display: grid;
+  grid-template-columns: var(--label-w) minmax(0, 1fr);
+  align-items: center;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.gantt-label {
+  display: flex;
+  flex-direction: column;
+  padding-right: 1rem;
+}
+.gantt-task {
+  font-size: 0.88rem;
+  color: var(--charcoal);
+}
+.gantt-note {
+  font-size: 0.72rem;
+  font-weight: 300;
+  color: var(--concrete-grey);
+}
+/* Faint 5-week grid behind the bars. */
+.gantt-track {
+  position: relative;
+  height: var(--bar-h);
+  background-image: linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: calc(100% / 6) 100%;
+}
+.gantt-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: var(--concrete-white);
+  background: var(--brand-navy);
+  border-radius: 2px;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.35);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s);
+}
+.gantt-trad .gantt-bar {
+  background: var(--concrete-grey);
+}
+/* Off-site factory work: hatched, to read as "not on the critical path". */
+.gantt-bar-factory {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--brand-accent-soft) 0 6px,
+    #4d6ad0 6px 12px
+  ) !important;
+}
+.compare-timeline.is-shown .gantt-bar {
+  transform: scaleX(1);
+}
+.gantt-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--label-w);
+  right: 0;
+  pointer-events: none;
+}
+.gantt-finish {
+  position: absolute;
+  top: -0.4rem;
+  bottom: 0;
+  border-left: 1.5px dashed var(--concrete-grey);
+  opacity: 0;
+  transition: opacity 0.4s ease 0.9s;
+}
+.gantt-pre .gantt-finish {
+  border-left-color: var(--brand-accent-soft);
+}
+.gantt-finish span {
+  position: absolute;
+  bottom: -1.3rem;
+  left: 0;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  color: var(--brand-navy);
+}
+.compare-timeline.is-shown .gantt-finish {
+  opacity: 1;
+}
+.compare-footnote {
+  margin-top: 2rem;
+  font-size: 0.75rem;
+  font-weight: 300;
+  color: var(--concrete-grey);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gantt-bar,
+  .gantt-finish {
+    transition: none;
+  }
+}
+
+/* Factor-by-factor table. */
+.compare-table {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  border-top: 1px solid var(--line);
+}
+.compare-tr {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1fr) minmax(0, 1fr);
+  border-bottom: 1px solid var(--line);
+}
+.compare-tr > span {
+  padding: 1.1rem 1.2rem;
+  font-size: 0.92rem;
+}
+.compare-thead > span {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--concrete-grey);
+}
+.compare-thead > span:last-child {
+  color: var(--concrete-white);
+  background: var(--brand-navy);
+}
+.compare-factor {
+  font-family: var(--font-display);
+  color: var(--brand-navy);
+}
+.compare-trad {
+  display: flex;
+  gap: 0.7rem;
+  font-weight: 300;
+  color: var(--concrete-grey);
+}
+.compare-pre {
+  display: flex;
+  gap: 0.7rem;
+  color: var(--brand-navy);
+  background: rgba(9, 27, 95, 0.04);
+}
+.compare-mark {
+  flex: none;
+  position: relative;
+  width: 16px;
+  height: 16px;
+  margin-top: 0.2rem;
+  border-radius: 50%;
+}
+.compare-mark-trad {
+  border: 1.5px solid var(--concrete-mid);
+}
+.compare-mark-trad::after {
+  content: "";
+  position: absolute;
+  left: 3.5px;
+  right: 3.5px;
+  top: 50%;
+  height: 1.5px;
+  margin-top: -0.75px;
+  background: var(--concrete-mid);
+}
+.compare-mark-pre {
+  background: var(--brand-navy);
+}
+.compare-mark-pre::after {
+  content: "";
+  position: absolute;
+  left: 5.5px;
+  top: 3px;
+  width: 4px;
+  height: 7px;
+  border: solid var(--concrete-white);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+
+@media (max-width: 700px) {
+  .compare-stats {
+    grid-template-columns: 1fr;
+  }
+  /* Labels stack above the bars so the track keeps the full width. */
+  .compare-timeline {
+    --label-w: 0px;
+  }
+  .gantt-row {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+  /* Stacked labels would sit under the finish line; the totals in each
+     chart header already carry that number. */
+  .gantt-overlay {
+    display: none;
+  }
+  /* Table → one card per factor. */
+  .compare-thead {
+    display: none;
+  }
+  .compare-tr {
+    grid-template-columns: 1fr;
+    padding: 1rem 0;
+  }
+  .compare-tr > span {
+    padding: 0.35rem 0;
+  }
+  .compare-pre {
+    background: none;
+  }
+}
+
 /* ------------------------ advantage (dark band) --------------------- */
 
 .content-section.dark {
