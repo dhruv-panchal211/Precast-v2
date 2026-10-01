@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Self-contained server bundle for the Docker image.
+  output: "standalone",
   // Production builds into a staging dir and is swapped in only on success
   // (see scripts/deploy.sh); the server runs from `.next-build`. Local dev
   // and plain `next build` keep the default.
